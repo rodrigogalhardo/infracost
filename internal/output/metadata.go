@@ -16,6 +16,8 @@ type Metadata struct {
 	CommitAuthorEmail string    `json:"vcsCommitAuthorEmail"`
 	CommitTimestamp   time.Time `json:"vcsCommitTimestamp"`
 	CommitMessage     string    `json:"vcsCommitMessage"`
+	ChangedObjects    []string  `json:"vcsChangedObjects,omitempty"`
+	ChangeBase        *string   `json:"vcsChangeBase,omitempty"`
 
 	VCSRepositoryURL     string   `json:"vcsRepositoryUrl,omitempty"`
 	VCSProvider          string   `json:"vcsProvider,omitempty"`
@@ -38,6 +40,8 @@ func NewMetadata(ctx *config.RunContext) Metadata {
 		CommitAuthorName:  ctx.VCSMetadata.Commit.AuthorName,
 		CommitTimestamp:   ctx.VCSMetadata.Commit.Time.UTC(),
 		CommitMessage:     ctx.VCSMetadata.Commit.Message,
+		ChangedObjects:    ctx.VCSMetadata.Commit.Changes,
+		ChangeBase:        ctx.VCSMetadata.Commit.ChangeBase,
 		VCSRepositoryURL:  ctx.VCSRepositoryURL(),
 	}
 

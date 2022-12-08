@@ -16,9 +16,10 @@ import (
 	"github.com/shopspring/decimal"
 	"golang.org/x/mod/semver"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/schema"
-	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -119,6 +120,14 @@ func CompareTo(current, prior Root) (Root, error) {
 		priorProjects[p.LabelWithMetadata()] = p.ToSchemaProject()
 	}
 
+	var gitDiff bool
+	for _, p := range current.Projects {
+		if p.Metadata.FromGitChange {
+			gitDiff = true
+			break
+		}
+	}
+
 	var schemaProjects schema.Projects
 	for _, p := range current.Projects {
 		scp := p.ToSchemaProject()
@@ -136,17 +145,21 @@ func CompareTo(current, prior Root) (Root, error) {
 	}
 
 	for _, scp := range priorProjects {
-		scp.PastResources = scp.Resources
-		scp.Resources = nil
-		scp.HasDiff = true
-		scp.Diff = schema.CalculateDiff(scp.PastResources, scp.Resources)
+		if !gitDiff {
+			scp.PastResources = scp.Resources
+			scp.Resources = nil
+			scp.HasDiff = true
+			scp.Diff = schema.CalculateDiff(scp.PastResources, scp.Resources)
+		} else {
+			scp.Metadata.FromGitChange = false
+		}
 
 		schemaProjects = append(schemaProjects, scp)
 	}
 
 	sort.Sort(schemaProjects)
 
-	out, err := ToOutputFormat(schemaProjects)
+	out, err := ToOutputFormat(schemaProjects, gitDiff)
 	if err != nil {
 		return out, err
 	}

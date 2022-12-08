@@ -18,7 +18,8 @@
         "path": "./cmd/infracost/testdata/",
         "type": "terraform_dir",
         "terraformWorkspace": "default",
-        "vcsSubPath": "cmd/infracost/testdata"
+        "vcsSubPath": "cmd/infracost/testdata",
+        "fromGitChange": false
       },
       "pastBreakdown": {
         "resources": [],
@@ -520,7 +521,8 @@
       "metadata": {
         "path": "./cmd/infracost/testdata/azure_firewall_plan.json",
         "type": "terraform_plan_json",
-        "vcsSubPath": "cmd/infracost/testdata/azure_firewall_plan.json"
+        "vcsSubPath": "cmd/infracost/testdata/azure_firewall_plan.json",
+        "fromGitChange": false
       },
       "pastBreakdown": {
         "resources": [],

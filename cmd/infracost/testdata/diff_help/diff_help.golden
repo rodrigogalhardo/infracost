@@ -21,6 +21,7 @@ FLAGS
       --config-file string           Path to Infracost config file. Cannot be used with path, terraform* or usage-file flags
       --exclude-path strings         Paths of directories to exclude, glob patterns need quotes
       --format string                Output format: json, diff (default "diff")
+      --git-diff string              Show only costs that have git changes compared to the provided branch. Use the name of the current branch to fetch changes from the last two commits (default "master")
   -h, --help                         help for diff
       --include-all-paths            Set project auto-detection to use all subdirectories in given path
       --no-cache                     Don't attempt to cache Terraform plans

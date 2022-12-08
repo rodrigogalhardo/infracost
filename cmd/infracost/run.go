@@ -68,6 +68,7 @@ func addRunFlags(cmd *cobra.Command) {
 
 	cmd.Flags().StringSlice("exclude-path", nil, "Paths of directories to exclude, glob patterns need quotes")
 	cmd.Flags().Bool("include-all-paths", false, "Set project auto-detection to use all subdirectories in given path")
+	cmd.Flags().String("git-diff", "master", "Show only costs that have git changes compared to the provided branch. Use the name of the current branch to fetch changes from the last two commits")
 
 	cmd.Flags().Bool("no-cache", false, "Don't attempt to cache Terraform plans")
 
@@ -91,7 +92,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	}
 
 	repoPath := runCtx.Config.RepoPath()
-	metadata, err := vcs.MetadataFetcher.Get(repoPath)
+	metadata, err := vcs.MetadataFetcher.Get(repoPath, runCtx.Config.ChangeTarget)
 	if err != nil {
 		logging.Logger.WithError(err).Debugf("failed to fetch vcs metadata for path %s", repoPath)
 	}
@@ -128,7 +129,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		go formatHCLProjects(wg, runCtx, hclProjects, hclR)
 	}
 
-	r, err := output.ToOutputFormat(projects)
+	r, err := output.ToOutputFormat(projects, false)
 	if err != nil {
 		return err
 	}
@@ -216,7 +217,7 @@ func formatHCLProjects(wg *sync.WaitGroup, ctx *config.RunContext, hclProjects [
 		}
 	}()
 
-	rr, err := output.ToOutputFormat(hclProjects)
+	rr, err := output.ToOutputFormat(hclProjects, false)
 	if err != nil {
 		log.Debugf("could not format hcl project to root output")
 	}
@@ -822,6 +823,13 @@ func getParallelism(cmd *cobra.Command, runCtx *config.RunContext) (int, error) 
 func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	hasPathFlag := cmd.Flags().Changed("path")
 	hasConfigFile := cmd.Flags().Changed("config-file")
+
+	if cmd.Flags().Changed("git-diff") {
+		s, _ := cmd.Flags().GetString("git-diff")
+		cfg.ChangeTarget = &s
+	}
+
+	cfg.CompareTo, _ = cmd.Flags().GetString("compare-to")
 
 	cfg.CompareTo, _ = cmd.Flags().GetString("compare-to")
 

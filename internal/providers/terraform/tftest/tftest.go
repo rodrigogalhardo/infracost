@@ -258,7 +258,7 @@ func goldenFileResourceTestWithOpts(t *testing.T, pName string, testName string,
 	projects, err = RunCostCalculations(runCtx, projects)
 	require.NoError(t, err)
 
-	r, err := output.ToOutputFormat(projects)
+	r, err := output.ToOutputFormat(projects, false)
 	if err != nil {
 		require.NoError(t, err)
 	}

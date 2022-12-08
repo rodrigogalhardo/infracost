@@ -98,7 +98,8 @@
         "vcsCommitAuthorName",
         "vcsCommitAuthorEmail",
         "vcsCommitTimestamp",
-        "vcsCommitMessage"
+        "vcsCommitMessage",
+        "vcsChangedObjects"
       ],
       "properties": {
         "infracostCommand": {
@@ -121,6 +122,15 @@
           "format": "date-time"
         },
         "vcsCommitMessage": {
+          "type": "string"
+        },
+        "vcsChangedObjects": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "vcsChangeTarget": {
           "type": "string"
         },
         "vcsRepositoryUrl": {
@@ -239,7 +249,8 @@
     "ProjectMetadata": {
       "required": [
         "path",
-        "type"
+        "type",
+        "fromGitChange"
       ],
       "properties": {
         "path": {
@@ -270,6 +281,9 @@
             "$ref": "#/definitions/Policy"
           },
           "type": "array"
+        },
+        "fromGitChange": {
+          "type": "boolean"
         }
       },
       "additionalProperties": false,

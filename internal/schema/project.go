@@ -28,6 +28,7 @@ type ProjectMetadata struct {
 	VCSSubPath          string    `json:"vcsSubPath,omitempty"`
 	Warnings            []Warning `json:"warnings,omitempty"`
 	Policies            Policies  `json:"policies,omitempty"`
+	FromGitChange       bool      `json:"fromGitChange"`
 }
 
 func (m *ProjectMetadata) WorkspaceLabel() string {

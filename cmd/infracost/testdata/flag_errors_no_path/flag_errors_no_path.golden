@@ -22,6 +22,7 @@ FLAGS
       --fields strings               Comma separated list of output fields: all,price,monthlyQuantity,unit,hourlyCost,monthlyCost.
                                      Supported by table and html output formats (default [monthlyQuantity,unit,monthlyCost])
       --format string                Output format: json, table, html (default "table")
+      --git-diff string              Show only costs that have git changes compared to the provided branch. Use the name of the current branch to fetch changes from the last two commits (default "master")
   -h, --help                         help for breakdown
       --include-all-paths            Set project auto-detection to use all subdirectories in given path
       --no-cache                     Don't attempt to cache Terraform plans

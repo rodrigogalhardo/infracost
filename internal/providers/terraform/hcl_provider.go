@@ -128,9 +128,14 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 	)
 
 	logger := ctx.Logger().WithFields(log.Fields{"provider": "terraform_dir"})
+	locatorConfig := &hcl.ProjectLocatorConfig{ExcludedSubDirs: ctx.ProjectConfig.ExcludePaths, UseAllPaths: ctx.ProjectConfig.IncludeAllPaths}
+	if ctx.RunContext.Config.ChangeTarget != nil {
+		locatorConfig.ChangedObjects = ctx.RunContext.VCSMetadata.Commit.Changes
+	}
+
 	parsers, err := hcl.LoadParsers(
 		ctx.ProjectConfig.Path,
-		&hcl.ProjectLocatorConfig{ExcludedSubDirs: ctx.ProjectConfig.ExcludePaths, UseAllPaths: ctx.ProjectConfig.IncludeAllPaths},
+		locatorConfig,
 		logger,
 		options...,
 	)
@@ -167,6 +172,7 @@ func (p *HCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 	}
 
 	metadata.TerraformWorkspace = p.ctx.ProjectConfig.TerraformWorkspace
+	metadata.FromGitChange = p.ctx.RunContext.Config.ChangeTarget != nil
 }
 
 // LoadResources calls a hcl.Parser to parse the directory config files into hcl.Blocks. It then builds a shallow

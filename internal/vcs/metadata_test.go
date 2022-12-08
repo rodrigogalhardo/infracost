@@ -93,7 +93,7 @@ func Test_metadataFetcher_GetLocalMetadata(t *testing.T) {
 		test:   &test,
 	}
 
-	actual, err := m.Get(tmp)
+	actual, err := m.Get(tmp, nil)
 	assert.NoError(t, err)
 
 	assert.Equal(t, Metadata{
@@ -135,7 +135,7 @@ func Test_metadataFetcher_GetLocalMetadataMergesWithEnv(t *testing.T) {
 		test:   &test,
 	}
 
-	actual, err := m.Get(tmp)
+	actual, err := m.Get(tmp, nil)
 	assert.NoError(t, err)
 
 	assert.Equal(t, Metadata{
@@ -220,7 +220,7 @@ func Test_metadataFetcher_Get_ReturnsUserDefinedEnvs(t *testing.T) {
 		test:   &test,
 	}
 
-	actual, _ := m.Get(t.TempDir())
+	actual, _ := m.Get(t.TempDir(), nil)
 
 	_, err := json.Marshal(actual)
 	assert.NoError(t, err)
@@ -265,7 +265,7 @@ func Test_metadataFetcher_Get_ReturnsPRIDFromURL(t *testing.T) {
 		test:   &test,
 	}
 
-	actual, _ := m.Get(t.TempDir())
+	actual, _ := m.Get(t.TempDir(), nil)
 
 	_, err := json.Marshal(actual)
 	assert.NoError(t, err)

@@ -395,7 +395,7 @@ func outputActualCosts(ac *schema.ActualCosts) *ActualCosts {
 	}
 }
 
-func ToOutputFormat(projects []*schema.Project) (Root, error) {
+func ToOutputFormat(projects []*schema.Project, gitDiff bool) (Root, error) {
 	var totalMonthlyCost, totalHourlyCost,
 		pastTotalMonthlyCost, pastTotalHourlyCost,
 		diffTotalMonthlyCost, diffTotalHourlyCost *decimal.Decimal
@@ -460,6 +460,10 @@ func ToOutputFormat(projects []*schema.Project) (Root, error) {
 					diffTotalMonthlyCost = decimalPtr(diffTotalMonthlyCost.Add(*diff.TotalMonthlyCost))
 				}
 			}
+		}
+
+		if gitDiff && !project.Metadata.FromGitChange {
+			continue
 		}
 
 		summary, err := BuildSummary(project.Resources, SummaryOptions{
