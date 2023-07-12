@@ -726,40 +726,14 @@ func (p *HCLProvider) countReferences(block *hcl.Block) *countExpression {
 var ignoredAttrs = map[string]bool{"arn": true, "id": true, "name": true, "self_link": true, "triggers": true}
 var checksumMarshaller = jsoniter.ConfigCompatibleWithStandardLibrary
 
-var mockValueRegex = regexp.MustCompile(`[a-zA-Z][a-zA-Z0-9-_]*-mock`)
-
-// var checksumMock = []byte("checksum-mock")
-
-func stripMocks(value interface{}) interface{} {
-	switch v := value.(type) {
-	case map[string]interface{}:
-		copy := make(map[string]interface{})
-		for k, v := range v {
-			copy[k] = stripMocks(v)
-		}
-		return copy
-	case []interface{}:
-		copy := make([]interface{}, len(v))
-		for i, v := range v {
-			v = stripMocks(v)
-			copy[i] = v
-		}
-		return copy
-	case string:
-		if mockValueRegex.MatchString(v) {
-			return nil
-		}
-		return v
-	default:
-		return v
-	}
-}
+var mockValueRegex = regexp.MustCompile(`"[^"]*[a-zA-Z][a-zA-Z0-9-_]*-mock[^"]*"`)
+var checksumMock = []byte("null")
 
 func generateChecksum(value map[string]interface{}) string {
 	filtered := make(map[string]interface{})
 	for k, v := range value {
 		if !ignoredAttrs[k] {
-			filtered[k] = stripMocks(v)
+			filtered[k] = v
 		}
 	}
 
@@ -769,13 +743,14 @@ func generateChecksum(value map[string]interface{}) string {
 	}
 
 	// mock values aren't always deterministic, so ignore them for the checksum
-	// serialized = mockValueRegex.ReplaceAll(serialized, checksumMock)
+	serialized = mockValueRegex.ReplaceAll(serialized, checksumMock)
 
 	h := sha256.New()
 	h.Write(serialized)
 
 	return hex.EncodeToString(h.Sum(nil))
 }
+
 
 func blockToReferences(block *hcl.Block) map[string]interface{} {
 	expressionValues := make(map[string]interface{})
