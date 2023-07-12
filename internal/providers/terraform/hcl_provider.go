@@ -727,13 +727,19 @@ var ignoredAttrs = map[string]bool{"arn": true, "id": true, "name": true, "self_
 var checksumMarshaller = jsoniter.ConfigCompatibleWithStandardLibrary
 
 var mockValueRegex = regexp.MustCompile(`[a-zA-Z][a-zA-Z0-9-_]*-mock`)
-var checksumMock = []byte("checksum-mock")
+
+// var checksumMock = []byte("checksum-mock")
 
 func generateChecksum(value map[string]interface{}) string {
 	filtered := make(map[string]interface{})
 	for k, v := range value {
 		if !ignoredAttrs[k] {
 			filtered[k] = v
+		}
+
+		j, err := checksumMarshaller.Marshal(v)
+		if err == nil && mockValueRegex.MatchString(string(j)) {
+			filtered[k] = nil
 		}
 	}
 
@@ -743,7 +749,7 @@ func generateChecksum(value map[string]interface{}) string {
 	}
 
 	// mock values aren't always deterministic, so ignore them for the checksum
-	serialized = mockValueRegex.ReplaceAll(serialized, checksumMock)
+	// serialized = mockValueRegex.ReplaceAll(serialized, checksumMock)
 
 	h := sha256.New()
 	h.Write(serialized)
