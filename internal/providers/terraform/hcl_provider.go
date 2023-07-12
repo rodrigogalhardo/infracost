@@ -730,16 +730,36 @@ var mockValueRegex = regexp.MustCompile(`[a-zA-Z][a-zA-Z0-9-_]*-mock`)
 
 // var checksumMock = []byte("checksum-mock")
 
+func stripMocks(value interface{}) interface{} {
+	switch v := value.(type) {
+	case map[string]interface{}:
+		copy := make(map[string]interface{})
+		for k, v := range v {
+			copy[k] = stripMocks(v)
+		}
+		return copy
+	case []interface{}:
+		copy := make([]interface{}, len(v))
+		for i, v := range v {
+			v = stripMocks(v)
+			copy[i] = v
+		}
+		return copy
+	case string:
+		if mockValueRegex.MatchString(v) {
+			return nil
+		}
+		return v
+	default:
+		return v
+	}
+}
+
 func generateChecksum(value map[string]interface{}) string {
 	filtered := make(map[string]interface{})
 	for k, v := range value {
 		if !ignoredAttrs[k] {
-			filtered[k] = v
-		}
-
-		j, err := checksumMarshaller.Marshal(v)
-		if err == nil && mockValueRegex.MatchString(string(j)) {
-			filtered[k] = nil
+			filtered[k] = stripMocks(v)
 		}
 	}
 
