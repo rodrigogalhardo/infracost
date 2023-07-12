@@ -723,7 +723,7 @@ func (p *HCLProvider) countReferences(block *hcl.Block) *countExpression {
 	return nil
 }
 
-var ignoredAttrs = map[string]bool{"arn": true, "id": true, "name": true, "self_link": true}
+var ignoredAttrs = map[string]bool{"arn": true, "id": true, "name": true, "self_link": true, "triggers": true}
 var checksumMarshaller = jsoniter.ConfigCompatibleWithStandardLibrary
 
 var mockValueRegex = regexp.MustCompile(`[a-zA-Z][a-zA-Z0-9-_]*-mock`)
